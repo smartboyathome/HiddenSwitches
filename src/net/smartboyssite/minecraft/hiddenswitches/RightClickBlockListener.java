@@ -18,8 +18,7 @@ public class RightClickBlockListener implements Listener
         if(event.getAction() == Action.RIGHT_CLICK_BLOCK)
         {
             Block clicked_block = event.getClickedBlock();
-            if(clicked_block.getType() == Material.LEVER || clicked_block.getType() == Material.WOOD_BUTTON || 
-               clicked_block.getType() == Material.STONE_BUTTON || event.getItem() != null)
+            if(blockIsRedstoneInteractable(clicked_block) || event.getItem() != null)
             {
                 return;
             }
@@ -43,19 +42,29 @@ public class RightClickBlockListener implements Listener
                     orthological_location.setZ(clicked_location.getZ() + mod);
                 }
                 Block orthological_block = world.getBlockAt(orthological_location);
-                if(orthological_block.getType() == Material.LEVER || orthological_block.getType() == Material.WOOD_BUTTON || 
-                   orthological_block.getType() == Material.STONE_BUTTON)
+                if(blockIsRedstoneInteractable(orthological_block))
                 {
-                    net.minecraft.server.v1_4_6.Block pure_minecraft_block = 
-                            net.minecraft.server.v1_4_6.Block.byId[orthological_block.getType().getId()];
-                    net.minecraft.server.v1_4_6.World pure_minecraft_world = 
-                            ((CraftWorld) orthological_block.getWorld()).getHandle();
-                    net.minecraft.server.v1_4_6.EntityHuman pure_minecraft_human = null;
-                    pure_minecraft_block.interact(pure_minecraft_world,
-                            orthological_block.getX(), orthological_block.getY(), orthological_block.getZ(),
-                            pure_minecraft_human, 0, (float)0.0, (float)0.0, (float)0.0);
+                    interactWithBlock(orthological_block);
                 }
             }
         }
+    }
+    
+    public boolean blockIsRedstoneInteractable(Block block)
+    {
+        return block.getType() == Material.LEVER || block.getType() == Material.WOOD_BUTTON || 
+               block.getType() == Material.STONE_BUTTON;
+    }
+    
+    public void interactWithBlock(Block block)
+    {
+        net.minecraft.server.v1_4_6.Block pure_minecraft_block = 
+                net.minecraft.server.v1_4_6.Block.byId[block.getType().getId()];
+        net.minecraft.server.v1_4_6.World pure_minecraft_world = 
+                ((CraftWorld) block.getWorld()).getHandle();
+        net.minecraft.server.v1_4_6.EntityHuman pure_minecraft_human = null;
+        pure_minecraft_block.interact(pure_minecraft_world,
+                block.getX(), block.getY(), block.getZ(),
+                pure_minecraft_human, 0, (float)0.0, (float)0.0, (float)0.0);
     }
 }
